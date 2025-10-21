@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Resume Builder</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+    .dark-mode {
+      background: #121212;
+      color: #eee;
+    }
+    header {
+      background: #0078D7;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 1rem;
+    }
+    .form, .preview {
+      flex: 1 1 45%;
+      margin: 1rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .dark-mode .form, .dark-mode .preview {
+      background: #1e1e1e;
+      box-shadow: none;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: inherit;
+      color: inherit;
+    }
+    h2 {
+      margin-top: 0;
+    }
+    .preview h1, .preview h2 {
+      margin: 0.5rem 0;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-dark { background: #333; color: white; }
+    .btn-print { background: #0078D7; color: white; }
+    .btn-download { background: #28a745; color: white; }
+    .btn-ai { background: #ff9800; color: white; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI-Powered Resume Builder</h1>
+  </header>
+  <div class="container">
+    <div class="form">
+      <h2>Enter Your Details</h2>
+      <select id="role">
+        <option value="">Select Role for AI Suggestion</option>
+        <option value="designer">UI/UX Designer</option>
+        <option value="developer">Web Developer</option>
+        <option value="marketer">Digital Marketer</option>
+      </select>
+      <input type="text" id="name" placeholder="Full Name" />
+      <input type="text" id="title" placeholder="Professional Title" />
+      <textarea id="summary" rows="3" placeholder="Professional Summary"></textarea>
+      <textarea id="experience" rows="4" placeholder="Work Experience"></textarea>
+      <textarea id="education" rows="3" placeholder="Education"></textarea>
+      <textarea id="skills" rows="2" placeholder="Skills (comma separated)"></textarea>
+      <div class="btn-group">
+        <button class="btn-ai" onclick="applyAISuggestions()">AI Suggest</button>
+        <button class="btn-dark" onclick="toggleDarkMode()">Dark Mode</button>
+        <button class="btn-print" onclick="window.print()">Export PDF</button>
+        <button class="btn-download" onclick="downloadResume()">Download HTML</button>
+      </div>
+    </div>
+    <div class="preview">
+      <h2>Live Preview</h2>
+      <div id="resume">
+        <h1 id="pName">Your Name</h1>
+        <h2 id="pTitle">Your Title</h2>
+        <p id="pSummary">Your professional summary will appear here.</p>
+        <h3>Experience</h3>
+        <p id="pExperience">Your experience details will appear here.</p>
+        <h3>Education</h3>
+        <p id="pEducation">Your education details will appear here.</p>
+        <h3>Skills</h3>
+        <p id="pSkills">Your skills will appear here.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const fields = ['name', 'title', 'summary', 'experience', 'education', 'skills'];
+    fields.forEach(field => {
+      document.getElementById(field).addEventListener('input', () => {
+        document.getElementById('p' + field.charAt(0).toUpperCase() + field.slice(1)).textContent =
+          document.getElementById(field).value || ' ';
+      });
+    });
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function applyAISuggestions() {
+      const role = document.getElementById('role').value;
+      const summary = {
+        designer: "Creative UI/UX Designer with a passion for intuitive interfaces and pixel-perfect layouts.",
+        developer: "Full-stack Web Developer skilled in building responsive, scalable applications using modern tech.",
+        marketer: "Digital Marketer focused on SEO, content strategy, and data-driven campaign optimization."
+      };
+      const skills = {
+        designer: "Figma, Adobe XD, Wireframing, Prototyping, User Research",
+        developer: "HTML, CSS, JavaScript, React, Node.js, Git",
+        marketer: "SEO, Google Analytics, Content Marketing, Email Campaigns, Social Media"
+      };
+      if (role) {
+        document.getElementById('summary').value = summary[role];
+        document.getElementById('skills').value = skills[role];
+        document.getElementById('summary').dispatchEvent(new Event('input'));
+        document.getElementById('skills').dispatchEvent(new Event('input'));
+      }
+    }
+
+    function downloadResume() {
+      const htmlContent = `
+        <html><head><title>My Resume</title></head><body>
+        ${document.getElementById('resume').innerHTML}
+        </body></html>`;
+      const blob = new Blob([htmlContent], {type: 'text/html'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'resume.html';
+      link.click();
+    }
+  </script>
+</body>
+</html>
